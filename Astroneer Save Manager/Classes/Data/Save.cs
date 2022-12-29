@@ -5,9 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Astroneer_Save_Manager.Classes.Data {
-    class Save {
-
+namespace Astroneer_Save_Manager.Classes.Data
+{
+    public class Save
+    {
         /// <summary>
         /// The custom name of the save.
         /// </summary>
@@ -24,25 +25,35 @@ namespace Astroneer_Save_Manager.Classes.Data {
 
         public static Save lastEnabled = null;
 
-        public Save(string saveName, List<string> saveFiles) {
+        public Save(string saveName, List<string> saveFiles)
+        {
             this.saveName = saveName;
             this.saveFiles = saveFiles;
         }
 
-        public void Disable() {
+        public Save(string saveName, List<string> saveFiles, bool isEnabled) : this(saveName, saveFiles)
+        {
+            this.isEnabled = isEnabled;
+        }
+
+        public void Disable()
+        {
             if (!isEnabled)
                 return;
 
             string pathToDisabledFolder = Path.Combine(FileManager.disabledSavePath, saveName);
 
             //Make sure the folder we're moving to exists.
-            if (!Directory.Exists(pathToDisabledFolder)) {
+            if (!Directory.Exists(pathToDisabledFolder))
+            {
                 Directory.CreateDirectory(pathToDisabledFolder);
             }
 
             //Move all the files to the disabled folder.
-            foreach (string s in Directory.GetFiles(FileManager.savePath)) {
+            foreach (string s in Directory.GetFiles(FileManager.savePath, "*.savegame"))
+            {
                 string fileName = Path.GetFileName(s);
+                if (!fileName.StartsWith(saveName)) continue;
                 string previousDirectory = Path.Combine(FileManager.savePath, fileName);
                 string newDirectory = Path.Combine(pathToDisabledFolder, fileName);
                 File.Move(previousDirectory, newDirectory);
@@ -55,7 +66,8 @@ namespace Astroneer_Save_Manager.Classes.Data {
             DataManager.disabledSaves[saveName] = this;
         }
 
-        public void Enable() {
+        public void Enable()
+        {
             if (isEnabled)
                 return;
 
@@ -66,12 +78,14 @@ namespace Astroneer_Save_Manager.Classes.Data {
             string pathToDisabledFolder = Path.Combine(FileManager.disabledSavePath, saveName);
 
             //Make sure the folder we're moving to exists.
-            if (!Directory.Exists(pathToDisabledFolder)) {
+            if (!Directory.Exists(pathToDisabledFolder))
+            {
                 Directory.CreateDirectory(pathToDisabledFolder);
             }
 
             //Move all the files over to the enabled folder
-            foreach (string s in Directory.GetFiles(pathToDisabledFolder)) {
+            foreach (string s in Directory.GetFiles(pathToDisabledFolder))
+            {
                 string fileName = Path.GetFileName(s);
                 string previousDirectory = Path.Combine(pathToDisabledFolder, fileName);
                 string newDirectory = Path.Combine(FileManager.savePath, fileName);
@@ -86,15 +100,20 @@ namespace Astroneer_Save_Manager.Classes.Data {
         }
 
 
-        public void Toggle() {
-            if (isEnabled) {
+        public void Toggle()
+        {
+            if (isEnabled)
+            {
                 Disable();
-            } else {
+            }
+            else
+            {
                 Enable();
             }
         }
 
-        public override string ToString() {
+        public override string ToString()
+        {
             return saveName + (isEnabled ? "" : "(DISABLED)");
         }
 

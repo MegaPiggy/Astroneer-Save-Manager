@@ -5,29 +5,36 @@ using System.Text;
 using System.Threading.Tasks;
 using Astroneer_Save_Manager.Classes.Data;
 
-namespace Astroneer_Save_Manager.Classes {
-    class UIManager {
+namespace Astroneer_Save_Manager.Classes
+{
+    public class UIManager
+    {
 
-        public static void Init() {
+        public static void Init()
+        {
 
         }
 
-        public static void FillOutLists() {
+        public static void FillOutLists()
+        {
 
             MainWindow.mainForm.saveSlotList.Items.Clear();
             MainWindow.mainForm.backupSlotList.Items.Clear();
 
             MainWindow.mainForm.saveSlotList.Items.Add(DataManager.enabledSave);
-            foreach (Save s in DataManager.disabledSaves.Values) {
+            foreach (Save s in DataManager.disabledSaves.Values)
+            {
                 MainWindow.mainForm.saveSlotList.Items.Add(s);
             }
 
-            foreach (BackupSave s in DataManager.backupSlotDictionary.Values) {
+            foreach (BackupSave s in DataManager.backupSlotDictionary.Values)
+            {
                 MainWindow.mainForm.backupSlotList.Items.Add(s);
             }
         }
 
-        public static void UpdateSaveProperties() {
+        public static void UpdateSaveProperties()
+        {
 
             if (MainWindow.mainForm.saveSlotList.SelectedItem == null)
                 return;
@@ -39,7 +46,8 @@ namespace Astroneer_Save_Manager.Classes {
 
         }
 
-        public static void UpdateBackupProperties() {
+        public static void UpdateBackupProperties()
+        {
             if (MainWindow.mainForm.backupSlotList.SelectedItem == null)
                 return;
 

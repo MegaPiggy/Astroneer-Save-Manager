@@ -5,8 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Astroneer_Save_Manager.Classes.Data {
-    public class BackupSave {
+namespace Astroneer_Save_Manager.Classes.Data
+{
+    public class BackupSave
+    {
 
         /// <summary>
         /// The custom name of the save.
@@ -21,12 +23,14 @@ namespace Astroneer_Save_Manager.Classes.Data {
         /// </summary>
         public bool isEnabled = false;
 
-        public BackupSave(string name, List<string> saveFiles) {
+        public BackupSave(string name, List<string> saveFiles)
+        {
             this.saveName = name;
             this.saveFiles = saveFiles;
         }
 
-        public void Disable() {
+        public void Disable()
+        {
             if (!isEnabled)
                 return;
 
@@ -35,7 +39,8 @@ namespace Astroneer_Save_Manager.Classes.Data {
             isEnabled = false;
         }
 
-        public void Enable() {
+        public void Enable()
+        {
             if (isEnabled)
                 return;
 
@@ -44,7 +49,8 @@ namespace Astroneer_Save_Manager.Classes.Data {
             isEnabled = true;
         }
 
-        public override string ToString() {
+        public override string ToString()
+        {
             return saveName;
         }
 

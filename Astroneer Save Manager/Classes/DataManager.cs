@@ -6,14 +6,17 @@ using System.Text;
 using System.Threading.Tasks;
 using Astroneer_Save_Manager.Classes.Data;
 
-namespace Astroneer_Save_Manager.Classes {
-    class DataManager {
+namespace Astroneer_Save_Manager.Classes
+{
+    public class DataManager
+    {
 
         public static Save enabledSave;
         public static Dictionary<string, Save> disabledSaves = new Dictionary<string, Save>();
         public static Dictionary<string, BackupSave> backupSlotDictionary = new Dictionary<string, BackupSave>();
 
-        public static void Init() {
+        public static void Init()
+        {
 
             ReadAllSaves();
 
@@ -21,11 +24,12 @@ namespace Astroneer_Save_Manager.Classes {
 
         }
 
-        public static void ReadAllSaves() {
+        public static void ReadAllSaves()
+        {
 
             //Read the enabled save
             {
-                string[] files = Directory.GetFiles(FileManager.savePath, "*.sav");
+                string[] files = Directory.GetFiles(FileManager.savePath, "*.savegame");
 
                 string saveInfoPath = Path.Combine(FileManager.savePath, "saveInfo.savinf");
                 string saveName = File.Exists(saveInfoPath) ? File.ReadAllText(saveInfoPath) : "Active Save";
@@ -41,9 +45,10 @@ namespace Astroneer_Save_Manager.Classes {
                 string[] subfolders = Directory.GetDirectories(FileManager.disabledSavePath);
                 int index = 0;
 
-                foreach (string s in subfolders) {
+                foreach (string s in subfolders)
+                {
 
-                    string[] files = Directory.GetFiles(s, "*.sav");
+                    string[] files = Directory.GetFiles(s, "*.savegame");
 
                     string saveInfoPath = Path.Combine(s, "saveInfo.savinf");
                     string saveName = File.Exists(saveInfoPath) ? File.ReadAllText(saveInfoPath) : index.ToString();
@@ -58,21 +63,26 @@ namespace Astroneer_Save_Manager.Classes {
 
         }
 
-        public static void ReadAllBackups() {
+        public static void ReadAllBackups()
+        {
 
         }
 
-        public static void RenameSave(Save toRename, string newName) {
+        public static void RenameSave(Save toRename, string newName)
+        {
 
             if (newName.Length == 0)
                 return;
 
-            if (toRename == enabledSave) {
+            if (toRename == enabledSave)
+            {
 
                 toRename.saveName = newName;
                 FileManager.UpdateSaveInfoFile(toRename);
 
-            } else if (disabledSaves.ContainsKey(toRename.saveName) && !disabledSaves.ContainsKey(newName)) {
+            }
+            else if (disabledSaves.ContainsKey(toRename.saveName) && !disabledSaves.ContainsKey(newName))
+            {
 
                 string oldName = toRename.saveName;
 
@@ -83,12 +93,15 @@ namespace Astroneer_Save_Manager.Classes {
                 string oldPath = Path.Combine(FileManager.disabledSavePath, oldName);
                 string newPath = Path.Combine(FileManager.disabledSavePath, newName);
 
-                if (newPath.Trim() != oldPath.Trim()) {
+                if (newPath.Trim() != oldPath.Trim())
+                {
                     Directory.Move(oldPath, newPath);
 
                     FileManager.UpdateSaveInfoFile(toRename, newName);
                 }
-            } else {
+            }
+            else
+            {
 
             }
 

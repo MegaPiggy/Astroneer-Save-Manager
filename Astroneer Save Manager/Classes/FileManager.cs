@@ -5,18 +5,21 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Astroneer_Save_Manager.Classes.Data;
+using System.Windows.Forms;
+using System.Globalization;
 
-namespace Astroneer_Save_Manager.Classes {
-    class FileManager {
-
+namespace Astroneer_Save_Manager.Classes
+{
+    public class FileManager
+    {
         public static string gamePath;
         public static string savePath;
         public static string disabledSavePath;
         public static string backupSavePath;
         public static string appDataPath;
 
-        public static void Init() {
-
+        public static void Init()
+        {
             //Create all the path variables.
             gamePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Astro", "Saved");
             savePath = Path.Combine(gamePath, "SaveGames");
@@ -36,81 +39,104 @@ namespace Astroneer_Save_Manager.Classes {
 
             UIManager.Init();
             DataManager.Init();
-
         }
 
-        public static void SetupIfNeeded() {
-
-            if (File.Exists(Path.Combine(appDataPath, "setupFile.sf"))) {
-                return;
-            }
-
-            //File.Create(Path.Combine(appDataPath, "setupFile.sf"));
-
+        public static void SetupIfNeeded()
+        {
             //Inital setup proccess, disable all saves except for save 0.
             {
 
-                Dictionary<int, Save> saveSlotsDictionary = new Dictionary<int, Save>();
-                string[] getFiles = Directory.GetFiles(savePath, "*.sav");
+                Dictionary<DateTime, Save> saveSlotsDictionary = new Dictionary<DateTime, Save>();
+                string[] getFiles = Directory.GetFiles(savePath, "*.savegame");
 
                 //Loop through all the files in the save folder
-                for (int i = 0; i < getFiles.Length; i++) {
-
+                for (int i = 0; i < getFiles.Length; i++)
+                {
                     //Get the save name and the index of the save according to the game.
                     string fileName = Path.GetFileNameWithoutExtension(getFiles[i]);
-                    int index = int.Parse(fileName[9].ToString());
+
+                    string saveName = fileName.Substring(0, fileName.IndexOf('$'));
+                    MessageBox.Show(fileName.Substring(fileName.IndexOf('$') + 1));
+                    DateTime date = DateTime.ParseExact(fileName.Substring(fileName.IndexOf('$') + 1), "yyyy.MM.dd-HH.mm.ss", CultureInfo.InvariantCulture);
 
                     //Create the save class if needed
-                    if (!saveSlotsDictionary.ContainsKey(index)) {
-                        saveSlotsDictionary[index] = new Save(index.ToString(), new List<string>());
+                    if (!saveSlotsDictionary.ContainsKey(date))
+                    {
+                        saveSlotsDictionary[date] = new Save(saveName, new List<string>());
                     }
 
                     //Add this save file to the class
-                    saveSlotsDictionary[index].saveFiles.Add(fileName);
+                    saveSlotsDictionary[date].saveFiles.Add(fileName);
+                }
+
+                string[] getDisabledFiles = Directory.GetFiles(disabledSavePath, "*.savegame", SearchOption.AllDirectories);
+
+                //Loop through all the files in the save folder
+                for (int i = 0; i < getDisabledFiles.Length; i++)
+                {
+                    //Get the save name and the index of the save according to the game.
+                    string fileName = Path.GetFileNameWithoutExtension(getDisabledFiles[i]);
+
+                    string saveName = fileName.Substring(0, fileName.IndexOf('$'));
+                    MessageBox.Show(fileName.Substring(fileName.IndexOf('$') + 1));
+                    DateTime date = DateTime.ParseExact(fileName.Substring(fileName.IndexOf('$') + 1), "yyyy.MM.dd-HH.mm.ss", CultureInfo.InvariantCulture);
+
+                    //Create the save class if needed
+                    if (!saveSlotsDictionary.ContainsKey(date))
+                    {
+                        saveSlotsDictionary[date] = new Save(saveName, new List<string>(), true);
+                    }
+
+                    //Add this save file to the class
+                    saveSlotsDictionary[date].saveFiles.Add(fileName);
                 }
 
                 //Disable all saves except the first one.
-                if (saveSlotsDictionary.Count > 0) {
-                    int firstSaveKey = saveSlotsDictionary.First().Key;
+                if (saveSlotsDictionary.Count > 0)
+                {
+                    var first = saveSlotsDictionary.FirstOrDefault();
+                    var firstSaveKey = first.Key;
 
-                    foreach (KeyValuePair<int, Save> s in saveSlotsDictionary) {
-                        if (s.Key != firstSaveKey) {
+                    foreach (var s in saveSlotsDictionary)
+                    {
+                        if (s.Key != firstSaveKey)
+                        {
                             s.Value.isEnabled = true;
                             s.Value.Disable();
                         }
                     }
+
+                    first.Value.isEnabled = false;
+                    first.Value.Enable();
                 }
-
-                saveSlotsDictionary.First().Value.isEnabled = false;
-                saveSlotsDictionary.First().Value.Enable();
-
             }
-
         }
 
-        public static void UpdateSaveInfoFile(Save update, string oldName = "") {
-
-            if (update.isEnabled) {
+        public static void UpdateSaveInfoFile(Save update, string oldName = "")
+        {
+            if (update.isEnabled)
+            {
                 string saveInfoPath = Path.Combine(FileManager.savePath, "saveInfo.savinf");
                 StreamWriter sw = File.CreateText(saveInfoPath);
                 sw.Write(update.saveName);
                 sw.Close();
-            } else {
+            }
+            else
+            {
                 string saveInfoPath = Path.Combine(FileManager.disabledSavePath, oldName, "saveInfo.savinf");
                 StreamWriter sw = File.CreateText(saveInfoPath);
                 sw.Write(update.saveName);
                 sw.Close();
             }
-
         }
 
-        public static void UpdateBackupInfoFile(BackupSave update) {
+        public static void UpdateBackupInfoFile(BackupSave update)
+        {
 
             string saveInfoPath = Path.Combine(FileManager.backupSavePath, update.saveName, "saveInfo.savinf");
             StreamWriter sw = File.CreateText(saveInfoPath);
             sw.Write(update.saveName);
             sw.Close();
-
         }
     }
 }
